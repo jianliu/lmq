@@ -1,5 +1,7 @@
 package com.liuj.lmq.client;
 
+import com.liuj.lmq.core.Message;
+
 import java.util.List;
 
 /**
@@ -11,6 +13,6 @@ public interface IMessageListener {
      * 接受到消息
      * @param message
      */
-    void onMessage(List<Object> message);
+    void onMessage(Message message);
 
 }

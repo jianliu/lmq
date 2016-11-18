@@ -1,4 +1,4 @@
-package com.liuj.lmq.bean;
+package com.liuj.lmq.core;
 
 import java.io.Serializable;
 import java.util.List;
@@ -15,12 +15,20 @@ public class Message implements Serializable {
      */
     private String messageId;
 
+    /**
+     * 消息所在的主题
+     */
     private String topic;
 
     /**
-     * 消息列表
+     * 文本
      */
-    private List<Object> messages;
+    private String text;
+
+    /**
+     * 消息的数据
+     */
+    private Object data;
 
     public String getMessageId() {
         return messageId;
@@ -38,11 +46,19 @@ public class Message implements Serializable {
         this.topic = topic;
     }
 
-    public List<Object> getMessages() {
-        return messages;
+    public String getText() {
+        return text;
     }
 
-    public void setMessages(List<Object> messages) {
-        this.messages = messages;
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
     }
 }

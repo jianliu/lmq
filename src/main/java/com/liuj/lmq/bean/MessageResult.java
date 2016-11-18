@@ -24,6 +24,9 @@ public class MessageResult implements Serializable {
      */
     private Boolean handled;
 
+    public MessageResult() {
+    }
+
     public MessageResult(String messageId, String topic, Boolean handled) {
         this.messageId = messageId;
         this.topic = topic;

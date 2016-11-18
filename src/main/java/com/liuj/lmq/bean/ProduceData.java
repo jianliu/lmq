@@ -8,12 +8,22 @@ import java.io.Serializable;
 public class ProduceData implements Serializable{
     
     private final static long serialVersionUID = 1L;
+
+    private String messageId;
     
     private String topic;
     
     private boolean multi;
     
     private Object data;
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
+    }
 
     public String getTopic() {
         return topic;

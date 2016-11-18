@@ -13,7 +13,7 @@ public class MessageInvoker {
     private IClient client;
 
     public void invoke(IMessageListener messageListener, List<Object> messages, Callback callback){
-        messageListener.onMessage(messages);
+        messageListener.onMessage(null);
         callback.callback();
     }
 

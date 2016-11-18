@@ -1,7 +1,7 @@
 package com.liuj.lmq.job;
 
 import com.liuj.lmq.GlobalManager;
-import com.liuj.lmq.bean.Message;
+import com.liuj.lmq.core.Message;
 import com.liuj.lmq.bean.MessageResult;
 import com.liuj.lmq.client.IConsumerClient;
 import com.liuj.lmq.client.IMessageListener;
@@ -37,6 +37,9 @@ public class MessageJob extends Thread {
 
     @Override
     public void run() {
+
+        this.consumerClient.getClient().sendMsg("");
+
         for (; ; ) {
             List<IMessageListener> iMessageListeners = GlobalManager.MESSAGES_LISTENS.get(this.topic);
             final Message message;
@@ -52,7 +55,7 @@ public class MessageJob extends Thread {
                 threadPool.submit(new Runnable() {
                     public void run() {
                         try {
-                            messageListener.onMessage(message.getMessages());
+                            messageListener.onMessage(message);
                         } catch (Exception e) {
                             logger.error("处理消息失败:topic:{}", topic, e);
                         } finally {
