@@ -17,7 +17,7 @@ public class ProducerMain {
         ProducerConfig producerConfig = new ProducerConfig();
         producerConfig.setTopic("halou2");
         Producer producer = new Producer(host, port, 3000, producerConfig);
-        producer.publish("{dali}");
+        producer.publish("{dali222}");
     }
 
 }

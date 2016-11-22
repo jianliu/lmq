@@ -1,4 +1,4 @@
-package com.liuj.lmq;
+package com.liuj.lmq.server;
 
 import com.liuj.lmq.client.IMessageListener;
 import com.liuj.lmq.core.Message;
@@ -13,21 +13,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 /**
  * Created by cdliujian1 on 2016/11/17.
  */
-public class GlobalManager {
+public class ServerManager {
 
     /**
-     * topic，机器队列
+     * server topic，机器队列
      */
     public final static ConcurrentMap<String, LinkedBlockingDeque<Message>> ALL_MESSAGES = new ConcurrentHashMap<String, LinkedBlockingDeque<Message>>();
 
-
-    /**
-     *
-     */
-    public final static ConcurrentMap<String, List<IMessageListener>> MESSAGES_LISTENS = new ConcurrentHashMap<String, List<IMessageListener>>();
-
-
-    public final static ConcurrentHashMap<String, ThreadPoolExecutor> TOPIC_THREAD_POOL = new ConcurrentHashMap<String, ThreadPoolExecutor>();
 
     /**
      * 订阅主题

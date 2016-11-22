@@ -1,6 +1,6 @@
 package com.liuj.lmq.job;
 
-import com.liuj.lmq.GlobalManager;
+import com.liuj.lmq.client.ClientManager;
 import com.liuj.lmq.core.Message;
 import com.liuj.lmq.bean.MessageResult;
 import com.liuj.lmq.client.IConsumerClient;
@@ -38,10 +38,10 @@ public class MessageJob extends Thread {
     @Override
     public void run() {
 
-        this.consumerClient.getClient().sendMsg("");
+//        this.consumerClient.getClient().sendMsg("");
 
         for (; ; ) {
-            List<IMessageListener> iMessageListeners = GlobalManager.MESSAGES_LISTENS.get(this.topic);
+            List<IMessageListener> iMessageListeners = ClientManager.MESSAGES_LISTENS.get(this.topic);
             final Message message;
             try {
                 message = messageQueue.take();

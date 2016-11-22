@@ -4,8 +4,12 @@ import com.liuj.lmq.bean.ProduceData;
 import com.liuj.lmq.config.ProducerConfig;
 import com.liuj.lmq.utils.AssertUtil;
 import com.liuj.lsf.client.ClientHandler;
+import com.liuj.lsf.core.ResponseListener;
+import com.liuj.lsf.core.impl.LsfResponseClientListener;
 import com.liuj.lsf.openapi.IClient;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -34,7 +38,12 @@ public class Producer implements IProducer{
         this.serverPort = serverPort;
         this.timeoutInMills = timeoutInMills;
         this.producerConfig = producerConfig;
-        client = new MQClient(this.server, this.serverPort, new ClientHandler());
+        List<ResponseListener> responseListeners = new ArrayList<ResponseListener>();
+        responseListeners.add(new LsfResponseClientListener());
+        responseListeners.add(new MQResponseListener());
+
+        ClientHandler clientHandler = new ClientHandler(responseListeners);
+        client = new MQClient(this.server, this.serverPort, clientHandler);
         client.setTimeout(this.timeoutInMills);
     }
 
