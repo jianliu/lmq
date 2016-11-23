@@ -1,5 +1,6 @@
 package com.liuj.lmq.client;
 
+import com.liuj.lmq.bean.Server;
 import com.liuj.lmq.config.ConsumerConfig;
 import com.liuj.lmq.core.Message;
 import com.liuj.lmq.utils.PropUtil;
@@ -20,14 +21,14 @@ public class ConsumerMain {
         String host = prop.getProperty("host");
         int port = Integer.valueOf(prop.getProperty("port"));
         String topic = prop.getProperty("topic");
-        MQConsumerClient consumerClient = new MQConsumerClient(host,port,5000);
+        MQConsumerClient consumerClient = new MQConsumerClient(new Server(host,port),5000);
         ConsumerConfig consumerConfig = new ConsumerConfig();
         consumerConfig.setTopic(topic);
         consumerClient.registerListener(consumerConfig, new IMessageListener() {
             public void onMessage(Message message) {
                 logger.info("handle message,id:{},text:{}", message.getMessageId(), message.getText());
             }
-        });
+        }, false);
         consumerClient.startWork();
     }
 

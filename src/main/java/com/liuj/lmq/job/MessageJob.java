@@ -1,5 +1,6 @@
 package com.liuj.lmq.job;
 
+import com.liuj.lmq.bean.Subscribe;
 import com.liuj.lmq.client.ClientManager;
 import com.liuj.lmq.core.Message;
 import com.liuj.lmq.bean.MessageResult;
@@ -8,6 +9,7 @@ import com.liuj.lmq.client.IMessageListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -39,6 +41,7 @@ public class MessageJob extends Thread {
     public void run() {
 
 //        this.consumerClient.getClient().sendMsg("");
+        subscribeTopic(topic);
 
         for (; ; ) {
             List<IMessageListener> iMessageListeners = ClientManager.MESSAGES_LISTENS.get(this.topic);
@@ -69,5 +72,19 @@ public class MessageJob extends Thread {
         }
 
         logger.warn("topic:{}处理线程已中断。", this.topic);
+    }
+
+
+    private void subscribeTopic(String topic) {
+        Subscribe subscribe = new Subscribe();
+        subscribe.setTopics(Arrays.asList(topic));
+        try {
+            //订阅服务
+            MessageResult result = (MessageResult)this.consumerClient.getClient().sendMsgRet(subscribe);
+
+            logger.info("订阅消息成功,{}", result.getHandled());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

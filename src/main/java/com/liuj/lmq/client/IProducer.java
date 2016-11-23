@@ -8,7 +8,7 @@ public interface IProducer {
     /**
      * 重连接
      */
-    void reconnect();
+    boolean reconnect();
 
     /**
      * 发布一条消息

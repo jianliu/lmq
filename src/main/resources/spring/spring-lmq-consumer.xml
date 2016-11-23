@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="GBK"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:lmq="http://www.liuj.com/schema/lmq"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.liuj.com/schema/lmq http://www.liuj.com/schema/lmq/lmq.xsd"
+	   default-autowire="byName">
+
+	<!--<lmq:registry  index="127.0.0.1" port="2222"/>-->
+
+	<!--server端地址-->
+    <lmq:server id="server" index="127.0.0.1" port="2222"/>
+
+	<!--多个consumer共享一个client，它负责和server端交流-->
+    <lmq:consumerClient id="consumerClient" server="server"/>
+
+	<!--消息监听器-->
+    <bean id="messageListener" class="com.liuj.lmq.client.DefaultMessageListener"/>
+
+	<!--消费者实例-->
+	<lmq:consumer id="defaultConsumer" topic="b" listener="messageListener" transport="consumerClient"
+                  corePoolSize="1" maxPoolSize="5"/>
+
+</beans>

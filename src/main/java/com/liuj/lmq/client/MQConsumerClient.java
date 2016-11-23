@@ -1,5 +1,6 @@
 package com.liuj.lmq.client;
 
+import com.liuj.lmq.bean.Server;
 import com.liuj.lmq.server.ServerManager;
 import com.liuj.lmq.bean.MessageResult;
 import com.liuj.lmq.bean.Subscribe;
@@ -13,7 +14,9 @@ import com.liuj.lsf.openapi.IClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
@@ -26,30 +29,38 @@ public class MQConsumerClient implements IConsumerClient {
 
     private final static Logger logger = LoggerFactory.getLogger(MQConsumerClient.class);
 
-    private String server;
+    private Server server;
 
-    private int serverPort;
-
-    private int timeoutInMills;
+    private int timeoutInMills = 5000;
 
     private ReentrantLock lock = new ReentrantLock();
 
     private IClient client;
 
-    public MQConsumerClient(String host, int port, int timeoutInMills) {
-        this.server = host;
-        this.serverPort = port;
+    public MQConsumerClient() {
+    }
+
+    public MQConsumerClient(Server server, int timeoutInMills) {
+        this.server = server;
         this.timeoutInMills = timeoutInMills;
+        init();
+    }
+
+    public void init(){
         List<ResponseListener> responseListeners = new ArrayList<ResponseListener>();
         responseListeners.add(new LsfResponseClientListener());
         responseListeners.add(new MQResponseListener());
 
         ClientHandler clientHandler = new ClientHandler(responseListeners);
-        client = new MQClient(this.server, this.serverPort, clientHandler);
-        client.setTimeout(this.timeoutInMills);
+        try {
+            client = new MQClient(this.server.getIndex(), this.server.getPort(), clientHandler);
+            client.setTimeout(this.timeoutInMills);
+        }catch (ConnectException ce){
+            logger.error("连接到server端失败");
+        }
     }
 
-    public void registerListener(ConsumerConfig consumerConfig, IMessageListener messageListener) {
+    public void registerListener(ConsumerConfig consumerConfig, IMessageListener messageListener, boolean openThread) {
         String topic = consumerConfig.getTopic();
         List<IMessageListener> messageListenerList = ClientManager.MESSAGES_LISTENS.get(topic);
         if (messageListenerList == null) {
@@ -63,6 +74,14 @@ public class MQConsumerClient implements IConsumerClient {
             threadPoolExecutor = new ThreadPoolExecutor(consumerConfig.getCorePoolSize(), consumerConfig.getMaxPoolSize(), 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(100));
             ClientManager.TOPIC_THREAD_POOL.putIfAbsent(topic, threadPoolExecutor);
         }
+
+        if(openThread) {
+            //注册时启动线程
+            LinkedBlockingDeque<Message> messageQueue = ServerManager.checkMessageTopic(topic);
+            MessageJob job = new MessageJob(ClientManager.TOPIC_THREAD_POOL.get(topic), messageQueue, this, topic);
+            job.start();
+        }
+
     }
 
     public void reconnect() {
@@ -78,6 +97,17 @@ public class MQConsumerClient implements IConsumerClient {
 
     public void startWork() {
         Set<String> topics = ClientManager.MESSAGES_LISTENS.keySet();
+        subscribeTopic(topics);
+
+        for (String topic : topics) {
+            LinkedBlockingDeque<Message> messageQueue = ServerManager.checkMessageTopic(topic);
+            MessageJob job = new MessageJob(ClientManager.TOPIC_THREAD_POOL.get(topic), messageQueue, this, topic);
+            job.start();
+        }
+        logger.warn("启动各业务线程池成功");
+    }
+
+    private void subscribeTopic(Set<String> topics) {
         Subscribe subscribe = new Subscribe();
         subscribe.setTopics(new ArrayList<String>(topics));
         try {
@@ -88,16 +118,17 @@ public class MQConsumerClient implements IConsumerClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        for (String topic : topics) {
-            LinkedBlockingDeque<Message> messageQueue = ServerManager.checkMessageTopic(topic);
-            MessageJob job = new MessageJob(ClientManager.TOPIC_THREAD_POOL.get(topic), messageQueue, this, topic);
-            job.start();
-        }
-        logger.warn("启动各业务线程池成功");
     }
 
     public IClient getClient() {
         return client;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
+    }
+
+    public void setTimeoutInMills(int timeoutInMills) {
+        this.timeoutInMills = timeoutInMills;
     }
 }

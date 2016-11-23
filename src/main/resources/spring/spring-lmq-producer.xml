@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="GBK"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:lmq="http://www.liuj.com/schema/lmq"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.liuj.com/schema/lmq http://www.liuj.com/schema/lmq/lmq.xsd"
+	   default-autowire="byName">
+
+	<!--<lmq:registry  index="127.0.0.1" port="2222"/>-->
+
+    <!--server端地址-->
+    <lmq:server id="server" index="127.0.0.1" port="2222"/>
+
+    <!--生产者对象-->
+    <lmq:producer id="producer" topic="b" server="server"/>
+
+</beans>

@@ -4,10 +4,13 @@ import com.liuj.lmq.bean.ProduceData;
 import com.liuj.lmq.config.ProducerConfig;
 import com.liuj.lmq.utils.AssertUtil;
 import com.liuj.lsf.client.ClientHandler;
+import com.liuj.lsf.core.AbstractLogger;
 import com.liuj.lsf.core.ResponseListener;
 import com.liuj.lsf.core.impl.LsfResponseClientListener;
 import com.liuj.lsf.openapi.IClient;
+import com.liuj.lmq.bean.Server;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -15,13 +18,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * Created by cdliujian1 on 2016/11/17.
  */
-public class Producer implements IProducer{
+public class Producer extends AbstractLogger implements IProducer{
 
-    private String server;
+    private Server server;
 
-    private int serverPort;
-
-    private int timeoutInMills;
+    private int timeoutInMills = 3000;
 
     private ProducerConfig producerConfig;
 
@@ -33,32 +34,55 @@ public class Producer implements IProducer{
 
     private ReentrantReadWriteLock.WriteLock writeLock = mainLock.writeLock();
 
-    public Producer(String server, int serverPort, int timeoutInMills, ProducerConfig producerConfig) {
+    public Producer() {
+    }
+
+    public Producer(Server server, int timeoutInMills, ProducerConfig producerConfig) {
         this.server = server;
-        this.serverPort = serverPort;
         this.timeoutInMills = timeoutInMills;
         this.producerConfig = producerConfig;
+        init();
+    }
+
+    public void init(){
         List<ResponseListener> responseListeners = new ArrayList<ResponseListener>();
         responseListeners.add(new LsfResponseClientListener());
         responseListeners.add(new MQResponseListener());
 
         ClientHandler clientHandler = new ClientHandler(responseListeners);
-        client = new MQClient(this.server, this.serverPort, clientHandler);
-        client.setTimeout(this.timeoutInMills);
+        try {
+            client = new MQClient(this.server.getIndex(), this.server.getPort(), clientHandler);
+            client.setTimeout(this.timeoutInMills);
+        }catch (ConnectException ce){
+            logger.warn("连接server端失败");
+        }
     }
 
-    public void reconnect(){
+    public boolean reconnect(){
         writeLock.lock();
         try {
-            client = new MQClient(this.server, this.serverPort, new ClientHandler());
+            client = new MQClient(this.server.getIndex(), this.server.getPort(), new ClientHandler());
             client.setTimeout(this.timeoutInMills);
+            return true;
+        }catch (ConnectException ce){
+            logger.warn("连接server端失败");
         }finally {
             writeLock.unlock();
         }
+        return false;
     }
 
     public void publish(Object data) {
         AssertUtil.notNull(data);
+        if(client == null ){
+            logger.warn("尝试连接到server");
+            boolean success = reconnect();
+            if(!success){
+                logger.error("连接到server端失败，请检测server地址是否可达");
+                throw new RuntimeException("连接到server端失败");
+            }
+        }
+
         readLock.lock();
         try {
             client.sendMsg(buildProduceData(data));
@@ -79,20 +103,12 @@ public class Producer implements IProducer{
         return produceData;
     }
 
-    public String getServer() {
+    public Server getServer() {
         return server;
     }
 
-    public void setServer(String server) {
+    public void setServer(Server server) {
         this.server = server;
-    }
-
-    public int getServerPort() {
-        return serverPort;
-    }
-
-    public void setServerPort(int serverPort) {
-        this.serverPort = serverPort;
     }
 
     public int getTimeoutInMills() {
@@ -101,5 +117,9 @@ public class Producer implements IProducer{
 
     public void setTimeoutInMills(int timeoutInMills) {
         this.timeoutInMills = timeoutInMills;
+    }
+
+    public void setProducerConfig(ProducerConfig producerConfig) {
+        this.producerConfig = producerConfig;
     }
 }

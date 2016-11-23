@@ -15,8 +15,9 @@ public interface IConsumerClient {
      * 注册主题的消息监听器
      * @param topic
      * @param messageListener
+     * @param openThread 开启topic扫描线程
      */
-    void registerListener(ConsumerConfig topic, IMessageListener messageListener);
+    void registerListener(ConsumerConfig topic, IMessageListener messageListener, boolean openThread);
     /**
      * 重连接
      */

@@ -1,0 +1,92 @@
+<xsd:schema xmlns="http://www.liuj.com/schema/lmq"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:beans="http://www.springframework.org/schema/beans"
+            targetNamespace="http://www.liuj.com/schema/lmq"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.springframework.org/schema/beans"/>
+
+    <xsd:annotation>
+        <xsd:documentation><![CDATA[
+	Defines the configuration elements for the Spring Framework's AOP support.
+		]]></xsd:documentation>
+    </xsd:annotation>
+
+    <xsd:element name="registry">
+
+        <xsd:complexType>
+            <xsd:attribute name="index" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation><![CDATA[
+	A named pointcut definition.
+						]]></xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="port" type="xsd:int">
+                <xsd:annotation>
+                    <xsd:documentation source="java:org.springframework.aop.Advisor"><![CDATA[
+	A named advisor definition.
+						]]></xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+
+            <xsd:attribute name="id" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation source="java:org.springframework.aop.Advisor"><![CDATA[
+	A named advisor definition.
+						]]></xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="server">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="beans:identifiedType">
+                    <xsd:attribute name="index" type="xsd:string"/>
+                    <xsd:attribute name="port" type="xsd:int"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="producer">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="beans:identifiedType">
+                    <xsd:attribute name="topic" type="xsd:string"/>
+                    <xsd:attribute name="server" type="xsd:string"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="consumerClient">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="beans:identifiedType">
+                    <xsd:attribute name="server" type="xsd:string"/>
+                    <xsd:attribute name="corePoolSize" type="xsd:int"/>
+                    <xsd:attribute name="maxPoolSize" type="xsd:int" default="200"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="consumer">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="beans:identifiedType">
+                    <xsd:attribute name="topic" type="xsd:string"/>
+                    <xsd:attribute name="listener" type="xsd:string"/>
+                    <xsd:attribute name="transport" type="xsd:string"/>
+                    <xsd:attribute name="corePoolSize" type="xsd:int"/>
+                    <xsd:attribute name="maxPoolSize" type="xsd:int" default="200"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+</xsd:schema>

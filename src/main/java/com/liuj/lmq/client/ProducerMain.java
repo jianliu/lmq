@@ -1,5 +1,6 @@
 package com.liuj.lmq.client;
 
+import com.liuj.lmq.bean.Server;
 import com.liuj.lmq.config.ProducerConfig;
 import com.liuj.lmq.utils.PropUtil;
 
@@ -16,7 +17,9 @@ public class ProducerMain {
         int port = Integer.valueOf(prop.getProperty("port"));
         ProducerConfig producerConfig = new ProducerConfig();
         producerConfig.setTopic("halou2");
-        Producer producer = new Producer(host, port, 3000, producerConfig);
+
+
+        Producer producer = new Producer(new Server(host, port), 3000, producerConfig);
         producer.publish("{dali222}");
     }
 
