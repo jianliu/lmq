@@ -40,14 +40,14 @@ server配置中心负责接收生产者推送的数据，然后分发给消费�
     <!--server端地址-->
     <lmq:server id="server" index="127.0.0.1" port="2222"/>
 
-	<!--多个consumer共享一个client，它负责和server端交流-->
+    <!--多个consumer共享一个client，它负责和server端交流-->
     <lmq:consumerClient id="consumerClient" server="server"/>
 
-	<!--消息监听器-->
+    <!--消息监听器-->
     <bean id="messageListener" class="com.liuj.lmq.client.DefaultMessageListener"/>
 
-	<!--消费者实例-->
-	<lmq:consumer id="defaultConsumer" topic="b" listener="messageListener" transport="consumerClient"
+    <!--消费者实例-->
+    <lmq:consumer id="defaultConsumer" topic="b" listener="messageListener" transport="consumerClient"
                   corePoolSize="1" maxPoolSize="5"/>
 
 ```
