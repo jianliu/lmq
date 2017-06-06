@@ -21,9 +21,10 @@
 ```
 
 ## MQ服务中心端，负责接收和分发消息
-server配置中心负责接收生产者推送的数据，然后分发给消费者，server端在内存中记录数据
-       server启动无spring配置，启动入口
+server配置中心负责接收生产者推送的数据，然后分发给消费者，server端在内存中记录数据server启动无spring配置，启动入口
+```java
        com.liuj.lmq.server.MQServer
+```
 
 ## 生产者端 producer
 生产者配置简单，多个生产者还未分离出一个相同的client负责传输数据到server
