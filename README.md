@@ -1,4 +1,4 @@
-一个简易的基于服务端内存的MQ :LMQ
+一个简易的基于服务端内存的MQ : LMQ
 ===
 
 ### 需要的依赖
@@ -21,7 +21,7 @@
 ```
 
 ## MQ服务中心端，负责接收和分发消息
-server配置中心负责接收生产者推送的数据，然后分发给消费者，server端在内存中记录数据server启动无spring配置，启动入口
+server配置中心负责接收生产者推送的数据，然后分发给消费者，server端在内存中记录数据，server启动无spring配置，启动入口为java main方法
 ```java
        com.liuj.lmq.server.MQServer
 ```
